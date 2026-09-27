@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình tạo mật mã 6 ký tự</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+       
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            padding: 20px;
+        }
+       
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+       
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+       
+        .subtitle {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.95rem;
+            margin-bottom: 36px;
+            line-height: 1.5;
+        }
+       
+        .password-box {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 16px;
+            padding: 28px 20px;
+            margin-bottom: 28px;
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+       
+        .password-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 210, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+       
+        @keyframes shine {
+            0% { left: -100%; }
+            50%, 100% { left: 100%; }
+        }
+       
+        #password {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            color: #00d2ff;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+            user-select: all;
+            word-break: break-all;
+        }
+       
+        .info {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 24px;
+        }
+       
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+       
+        button {
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+            color: #fff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+        }
+       
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 210, 255, 0.45);
+        }
+       
+        button:active {
+            transform: translateY(0);
+        }
+       
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+       
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+       
+        .copied {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00c853;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 100;
+        }
+       
+        .copied.show {
+            opacity: 1;
+        }
+       
+        .stats {
+            margin-top: 28px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+       
+        @media (max-width: 480px) {
+            .container {
+                padding: 36px 24px;
+            }
+            #password {
+                font-size: 2.2rem;
+                letter-spacing: 5px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Mật mã ngẫu nhiên</h1>
+        <p class="subtitle">Mỗi lần truy cập trang sẽ tạo một mật mã 6 ký tự hoàn toàn mới (chữ + số).</p>
+       
+        <div class="password-box">
+            <div id="password">------</div>
+        </div>
+       
+        <p class="info">Click vào mật mã để chọn, hoặc dùng nút bên dưới</p>
+       
+        <div class="btn-group">
+            <button onclick="generatePassword()">🔄 Tạo mới</button>
+            <button class="btn-secondary" onclick="copyPassword()">📋 Sao chép</button>
+        </div>
+       
+        <div class="stats" id="stats"></div>
+    </div>
+   
+    <div class="copied" id="copiedMsg">Đã sao chép!</div>
+
+    <script>
+        // Tập ký tự: chữ cái (A-Z, a-z) + số (0-9)
+        const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const PASSWORD_LENGTH = 6;
+       
+        // Lưu trong bộ nhớ RAM (không dùng localStorage để tránh lỗi sandbox)
+        let history = [];
+        let count = 0;
+       
+        function generateUniquePassword() {
+            let password;
+            let attempts = 0;
+            const maxAttempts = 50;
+           
+            do {
+                password = '';
+                for (let i = 0; i < PASSWORD_LENGTH; i++) {
+                    password += CHARS.charAt(Math.floor(Math.random() * CHARS.length));
+                }
+                attempts++;
+            } while (history.includes(password) && attempts < maxAttempts);
+           
+            // Lưu vào mảng trong bộ nhớ (chỉ trong phiên hiện tại)
+            if (!history.includes(password)) {
+                history.push(password);
+                // Giới hạn tối đa 500 mật mã trong bộ nhớ
+                if (history.length > 500) {
+                    history.shift();
+                }
+            }
+           
+            count++;
+            return password;
+        }
+       
+        function generatePassword() {
+            const password = generateUniquePassword();
+            document.getElementById('password').textContent = password;
+            updateStats();
+        }
+       
+        function copyPassword() {
+            const password = document.getElementById('password').textContent;
+            if (password === '------') return;
+           
+            // Cách 1: Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(password).then(showCopied).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
+           
+            function fallbackCopy() {
+                // Cách 2: execCommand (hỗ trợ hầu hết trình duyệt)
+                const textarea = document.createElement('textarea');
+                textarea.value = password;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopied();
+                } catch (e) {
+                    // Nếu vẫn lỗi thì chọn text để người dùng tự copy
+                    const range = document.createRange();
+                    range.selectNode(document.getElementById('password'));
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                }
+                document.body.removeChild(textarea);
+            }
+           
+            function showCopied() {
+                const msg = document.getElementById('copiedMsg');
+                msg.classList.add('show');
+                setTimeout(() => msg.classList.remove('show'), 2000);
+            }
+        }
+       
+        function updateStats() {
+            document.getElementById('stats').textContent =
+                `Đã tạo ${count} mật mã trong phiên này`;
+        }
+       
+        // Tạo mật mã ngay khi tải trang
+        window.onload = function() {
+            generatePassword();
+        };
+    </script>
+</body>
+</html>
